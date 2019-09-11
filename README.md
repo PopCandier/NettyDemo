@@ -105,3 +105,5 @@ ByteBuf delimiter = Unpooled.copiedBuffer("$_".getBytes());
 
 我们将使用Netty的`ObjectEncoder`和`ObjectDecoder`对订购请求和应答消息进行序列化。
 
+#### Google Protobuf 编解码
+
