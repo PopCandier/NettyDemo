@@ -26,7 +26,7 @@ public final class MarshallingCodeCFactory {
                 marshallerFactory,configuration
         );
 
-        MarshallingDecoder decoder = new MarshallingDecoder(provider);
+        MarshallingDecoder decoder = new MarshallingDecoder(provider,1024);
         return decoder;
     }
 

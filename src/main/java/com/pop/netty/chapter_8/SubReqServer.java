@@ -32,7 +32,7 @@ public class SubReqServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(
                                     MarshallingCodeCFactory.buildMarshllingDecoder()
-                            )     ;
+                            );
                             ch.pipeline().addLast(MarshallingCodeCFactory
                             .buildMarshallingEncoder());
 
