@@ -256,6 +256,7 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 
         response.headers().set("Content-Type","text/plain;charset=utf-8");
 
+        //什么时候需要加上这个返回
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
 
     }

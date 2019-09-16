@@ -37,7 +37,7 @@ public class ChineseProverbClient {
             channel.writeAndFlush(
                     new DatagramPacket(
                             Unpooled.copiedBuffer("随机数字", Charset.forName("utf-8")),
-                            new InetSocketAddress("255.255.255.255",port))).sync();
+                            new InetSocketAddress("2 55.255.255.255",port))).sync();
 
             //15 s 回应
             if(!channel.closeFuture().await(15000)){
