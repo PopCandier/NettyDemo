@@ -1,4 +1,4 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.protocol;
 
 import io.netty.buffer.ByteBuf;
 import org.jboss.marshalling.ByteOutput;

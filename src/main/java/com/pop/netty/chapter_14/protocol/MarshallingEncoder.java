@@ -1,9 +1,8 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.protocol;
 
 import com.pop.netty.chapter_8.MarshallingCodeCFactory;
 import io.netty.buffer.ByteBuf;
 import org.jboss.marshalling.Marshaller;
-import org.jboss.marshalling.Marshalling;
 
 import java.io.IOException;
 

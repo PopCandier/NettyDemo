@@ -1,5 +1,7 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.protocol;
 
+import com.pop.netty.chapter_14.entity.Header;
+import com.pop.netty.chapter_14.entity.NettyMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -62,7 +64,7 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
                 in.readBytes(keyArray);//写入这么长的key1的内容
                 //获得key
                 key = new String(keyArray,"utf-8");
-                attch.put(key,null);
+                attch.put(key,marshallingDecoder.decode(in));
             }
             keyArray = null;
             key = null;
@@ -70,7 +72,7 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 
         }
         if(in.readableBytes()>4){
-            message.setBody(null);
+            message.setBody(marshallingDecoder.decode(in));
         }
 
         message.setHeader(header);

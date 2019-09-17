@@ -1,4 +1,4 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.protocol;
 
 import io.netty.buffer.ByteBuf;
 import org.jboss.marshalling.ByteInput;
@@ -35,12 +35,19 @@ public class ChannelBufferByteInput implements ByteInput {
 
     @Override
     public int read(byte[] bytes) throws IOException {
-        return 0;
+        return read(bytes,0,bytes.length);
     }
 
     @Override
     public int read(byte[] bytes, int i, int i1) throws IOException {
-        return 0;
+        int available = available();
+        if(available==0){return -1;}
+        /**
+         * 可读长度和读到哪里取最小值，放置不越界
+         */
+        i1 = Math.min(available,i1);
+        byteBuf.readBytes(bytes,i,i1);
+        return i1;
     }
 
     @Override
@@ -50,7 +57,13 @@ public class ChannelBufferByteInput implements ByteInput {
 
     @Override
     public long skip(long l) throws IOException {
-        return 0;
+        int readable = byteBuf.readableBytes();
+        if(readable<l){
+            //可能越界，因为只读的数目是小于传入的数目的
+            l = readable;
+        }
+        byteBuf.readerIndex((int) (byteBuf.readerIndex()+l));
+        return l;
     }
 
     @Override

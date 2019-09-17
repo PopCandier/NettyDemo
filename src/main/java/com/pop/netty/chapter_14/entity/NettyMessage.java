@@ -1,4 +1,4 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.entity;
 
 import lombok.Data;
 

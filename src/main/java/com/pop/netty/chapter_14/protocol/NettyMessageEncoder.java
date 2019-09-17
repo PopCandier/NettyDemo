@@ -1,6 +1,8 @@
-package com.pop.netty.chapter_14;
+package com.pop.netty.chapter_14.protocol;
 
 
+import com.pop.netty.chapter_14.entity.Header;
+import com.pop.netty.chapter_14.entity.NettyMessage;
 import com.pop.utils.CharsetUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -35,12 +37,12 @@ public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
         ByteBuf sendBuf = Unpooled.buffer();
         //进行编码操作
         Header header = message.getHeader();
-        sendBuf.writeInt(header.getCrcCode());
-        sendBuf.writeInt(header.getLength());
-        sendBuf.writeLong(header.getSessionID());
-        sendBuf.writeByte(header.getType());
-        sendBuf.writeByte(header.getPriority());
-        sendBuf.writeInt(header.getAttachment().size());
+        sendBuf.writeInt(header.getCrcCode());//4
+        sendBuf.writeInt(header.getLength());//4
+        sendBuf.writeLong(header.getSessionID());//8
+        sendBuf.writeByte(header.getType());//1
+        sendBuf.writeByte(header.getPriority());//1
+        sendBuf.writeInt(header.getAttachment().size());//4
         //以上为header的编码
         String key = null;
         byte[] keyArray = null;
@@ -60,8 +62,9 @@ public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
             marshallingEncoder.encode(message.getBody(),sendBuf);
         }else{
             sendBuf.writeInt(0);
-            sendBuf.setInt(4,sendBuf.readableBytes());
         }
+        //相当于更新header中的length字段
+        sendBuf.setInt(4,sendBuf.readableBytes());
 
     }
 }
