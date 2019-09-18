@@ -60,9 +60,10 @@ public class LoginAuthRespHandler extends ChannelInboundHandlerAdapter {
                     nodeCheck.put(nodeIndex,true);
                 }
 
-                System.out.println(" 这个登陆响应 是: "+loginResp+" body ["+loginResp.getBody()+"]");
-            }
 
+            }
+            System.out.println(" 这个登陆响应 是: "+loginResp+" body ["+loginResp.getBody()+"]");
+            ctx.writeAndFlush(loginResp);
         }else{
             ctx.fireChannelRead(msg);
         }

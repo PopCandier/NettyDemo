@@ -39,9 +39,17 @@ public class NettyClient {
 
                             ChannelPipeline pipeline = ch.pipeline();
                             //为什么要移动四个字节呢，因为crcCode占有4个，但是这个是没有意义的
+                            /**
+                             * 为了防止由于单条
+                             * 消息过大导致内存溢出
+                             * 或者畸形码流导致
+                             * 解码错误引起内存分配
+                             * 失败，我们对单条消息最大
+                             * 长度进行了上限设置
+                             */
                             pipeline.addLast(
                                     new NettyMessageDecoder(1024*1024,
-                                            4,4)
+                                            4,4,0,0)
                             );
 
                             pipeline.addLast("MessageEncoder",
@@ -71,12 +79,20 @@ public class NettyClient {
                     });
             //发起异步连接
             //前者是要发起的ip地址，后者是自己的
+            /*
+            * 我们绑定本地端口，主要用于服务端
+            * 重复登录保护，另外，从产品角度
+            * 管理的角度来看，一般情况下不允许
+            * 系统随便使用随机端口
+            *
+            * */
             ChannelFuture future = b.connect(
-                    new InetSocketAddress(host,port),
-                    new InetSocketAddress(NettyConstant.HOST,NettyConstant.PORT)
+                    new InetSocketAddress(host,port)
             ).sync();
-
+            System.out.println("客户端 远程地址 ："+host+" "+port+
+                    " 本机状态为 : "+NettyConstant.HOST+" "+NettyConstant.PORT);
             future.channel().closeFuture().sync();//如果客户端监听到了断线异常，会断开
+            System.out.println("客户端 远程地址 已经断开");
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -88,7 +104,7 @@ public class NettyClient {
                         TimeUnit.SECONDS.sleep(5);
 
                         //休息五秒后，不停的连接
-                        connect(NettyConstant.REMOTEIP,NettyConstant.REMOTEHOST);
+                        connect(NettyConstant.REMOTEPORT,NettyConstant.REMOTEHOST);
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -100,7 +116,7 @@ public class NettyClient {
     }
 
     public static void main(String[] args) {
-        new NettyClient().connect(NettyConstant.REMOTEIP,NettyConstant.REMOTEHOST);
+        new NettyClient().connect(NettyConstant.REMOTEPORT,NettyConstant.REMOTEHOST);
     }
 
 

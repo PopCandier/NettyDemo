@@ -7,6 +7,7 @@ import com.pop.utils.CharsetUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.Map;
  * @author: pop
  * @create: 2019-09-17 15:06
  **/
-public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
+public class NettyMessageEncoder extends MessageToByteEncoder<NettyMessage> {
 
     MarshallingEncoder marshallingEncoder;
 
@@ -28,13 +29,11 @@ public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, NettyMessage message, List<Object> list) throws Exception {
-
-        if(message!=null||message.getHeader()==null){
+    protected void encode(ChannelHandlerContext channelHandlerContext, NettyMessage message, ByteBuf sendBuf) throws Exception {
+        if(message==null||message.getHeader()==null){
             throw new Exception(" 解码后的 消息为null");
         }
 
-        ByteBuf sendBuf = Unpooled.buffer();
         //进行编码操作
         Header header = message.getHeader();
         sendBuf.writeInt(header.getCrcCode());//4
@@ -63,8 +62,11 @@ public class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
         }else{
             sendBuf.writeInt(0);
         }
-        //相当于更新header中的length字段
-        sendBuf.setInt(4,sendBuf.readableBytes());
-
+        //相当于更新header中的length字段   readableBytes 与writerIndex是相同的
+        //解释一下这里为什么要-4，如果这是一个没有包含数据，也就是body的包
+        //这里一共是26位bit，然后我们会在4这个位置重新将数据长度设置进去，但是由于前面有四个没有意义的占位codec和字符的长度，所以我们要剔除
+        //前面的占位符，后面才是真正的数据体
+        sendBuf.setInt(4,sendBuf.readableBytes()-8);
     }
+
 }

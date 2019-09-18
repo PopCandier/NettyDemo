@@ -29,8 +29,8 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
 
     MarshallingDecoder marshallingDecoder;
 
-    public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) throws IOException {
-        super(maxFrameLength, lengthFieldOffset, lengthFieldLength);
+    public NettyMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip) throws IOException {
+        super(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
         marshallingDecoder = new MarshallingDecoder();
     }
 
@@ -43,14 +43,14 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
         }
         NettyMessage message = new NettyMessage();
         Header header = new Header();
-        header.setCrcCode(in.readInt());
-        header.setLength(in.readInt());
-        header.setSessionID(in.readLong());
-        header.setType(in.readByte());
-        header.setPriority(in.readByte());
+        header.setCrcCode(frame.readInt());
+        header.setLength(frame.readInt());
+        header.setSessionID(frame.readLong());
+        header.setType(frame.readByte());
+        header.setPriority(frame.readByte());
 
         //从这里获得后面对象body的长度和内容
-        int size = in.readInt();
+        int size = frame.readInt();
         if(size>0){
             Map<String,Object> attch = new HashMap<String,Object>(size);
             int keySize=0;
@@ -59,20 +59,20 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
             for(int i =0;i<size;i++){
                 //这个size是这个对象的长度
                 //第一个值是获取这个key有多长
-                keySize = in.readInt();
+                keySize = frame.readInt();
                 keyArray = new byte[keySize];
-                in.readBytes(keyArray);//写入这么长的key1的内容
+                frame.readBytes(keyArray);//写入这么长的key1的内容
                 //获得key
                 key = new String(keyArray,"utf-8");
-                attch.put(key,marshallingDecoder.decode(in));
+                attch.put(key,marshallingDecoder.decode(frame));
             }
             keyArray = null;
             key = null;
             header.setAttachment(attch);
 
         }
-        if(in.readableBytes()>4){
-            message.setBody(marshallingDecoder.decode(in));
+        if(frame.readableBytes()>4){//之前做了int的塞入，如果是含有方法体，长度是会超过4的
+            message.setBody(marshallingDecoder.decode(frame));
         }
 
         message.setHeader(header);
