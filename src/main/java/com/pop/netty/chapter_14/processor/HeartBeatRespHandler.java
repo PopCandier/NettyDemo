@@ -31,6 +31,7 @@ public class HeartBeatRespHandler extends ChannelInboundHandlerAdapter {
         Header header = new Header();
         header.setType(MessageType.PING_PONG_RESP.value());
         message.setHeader(header);
+
         return message;
     }
 
