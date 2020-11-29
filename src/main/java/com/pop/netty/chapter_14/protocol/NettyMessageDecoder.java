@@ -50,6 +50,8 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
         header.setPriority(frame.readByte());
 
         //从这里获得后面对象body的长度和内容
+
+
         int size = frame.readInt();
         if(size>0){
             Map<String,Object> attch = new HashMap<String,Object>(size);

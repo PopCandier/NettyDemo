@@ -45,6 +45,8 @@ public class NettyServer {
 
                         pipeline.addLast(new LoginAuthRespHandler());
 
+
+
                         pipeline.addLast("heartBeatHandler",
                                 new HeartBeatRespHandler());
 

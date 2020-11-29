@@ -39,7 +39,8 @@ public class NioClient {
             client.register(selector, SelectionKey.OP_READ);
         }else{
             /**
-             * 连接不成功可能会有两种情况，第一种是请求发送成功了，但是还没有得到回执
+             * 连接不成功可能会有两种情况，第一种是请求发送成功了，但是还没有得
+             * 到回执
              * 也就是物理链路没有建立
              * 另外一种则是真的连接失败
              */
